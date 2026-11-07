@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Raíces · Árbol familiar</title>
+  <meta name="description" content="Crea y guarda el árbol genealógico de tu familia, sin conexión y en tu dispositivo.">
+  <meta name="theme-color" content="#f4f1e8" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#151a15" media="(prefers-color-scheme: dark)">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Raíces">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Iconos -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M5 19c0-8 5-14 15-15-1 10-7 15-15 15Z"/><path d="M5 19 13 11"/></symbol>
+      <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+      <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+      <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></symbol>
+      <symbol id="i-dots" viewBox="0 0 24 24"><circle cx="5.5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18.5" cy="12" r="1.3"/></symbol>
+      <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+      <symbol id="i-fit" viewBox="0 0 24 24"><path d="M4 9V5a1 1 0 0 1 1-1h4M15 4h4a1 1 0 0 1 1 1v4M20 15v4a1 1 0 0 1-1 1h-4M9 20H5a1 1 0 0 1-1-1v-4"/></symbol>
+      <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16v4Z"/><path d="m13.5 6.5 4 4"/></symbol>
+      <symbol id="i-trash" viewBox="0 0 24 24"><path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12"/></symbol>
+      <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/></symbol>
+      <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M5 20h14"/></symbol>
+      <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v12M7 11l5 5 5-5M5 20h14"/></symbol>
+      <symbol id="i-sprout" viewBox="0 0 24 24"><path d="M12 21v-9"/><path d="M12 12c0-4-3-6-7-6 0 4 3 6 7 6Z"/><path d="M12 10c0-3.5 2.5-6 7-6 0 4-3 6-7 6Z"/></symbol>
+      <symbol id="i-arrows" viewBox="0 0 24 24"><path d="M12 4v16M8 8l4-4 4 4M8 16l4 4 4-4"/></symbol>
+      <symbol id="i-install" viewBox="0 0 24 24"><rect x="6" y="3" width="12" height="18" rx="2.5"/><path d="M12 8v6M9.5 11.5 12 14l2.5-2.5"/></symbol>
+      <symbol id="i-reset" viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.5-5.8"/><path d="M4 4v4h4"/></symbol>
+    </defs>
+  </svg>
+
+  <div class="ambient" aria-hidden="true">
+    <span class="drift d1"></span><span class="drift d2"></span><span class="drift d3"></span>
+  </div>
+
+  <header class="topbar">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+        <path class="bm-trunk" d="M16 29V15M16 20l-5-4M16 17l5-4"/>
+        <path class="bm-leaf a" d="M11 16c-4 0-6-3-6-6 4 0 6 2 6 6Z"/>
+        <path class="bm-leaf b" d="M21 13c0-4 2-7 6-7 0 4-2 7-6 7Z"/>
+        <path class="bm-leaf c" d="M16 15c-2.5-3-2.5-7 0-10 2.5 3 2.5 7 0 10Z"/>
+      </svg>
+      <div>
+        <h1>Raíces</h1>
+        <p class="stats" id="stats"></p>
+      </div>
+    </div>
+
+    <div class="search" id="search">
+      <svg class="ic"><use href="#i-search"/></svg>
+      <input id="searchInput" type="search" placeholder="Buscar a alguien…" autocomplete="off" aria-label="Buscar persona">
+      <ul class="results" id="searchResults" role="listbox"></ul>
+    </div>
+
+    <div class="actions">
+      <button class="icon-btn only-mobile" id="btnSearch" aria-label="Buscar"><svg class="ic"><use href="#i-search"/></svg></button>
+      <button class="btn primary" id="btnAdd"><svg class="ic"><use href="#i-plus"/></svg><span>Añadir</span></button>
+      <div class="menu-wrap">
+        <button class="icon-btn" id="btnMenu" aria-label="Más opciones" aria-haspopup="true" aria-expanded="false"><svg class="ic"><use href="#i-dots"/></svg></button>
+        <div class="menu" id="menu" role="menu" hidden>
+          <button role="menuitem" data-action="import"><svg class="ic"><use href="#i-upload"/></svg>Cargar árbol <small>.json · .ged</small></button>
+          <button role="menuitem" data-action="export-json"><svg class="ic"><use href="#i-download"/></svg>Guardar copia <small>.json</small></button>
+          <button role="menuitem" data-action="export-ged"><svg class="ic"><use href="#i-download"/></svg>Exportar GEDCOM <small>.ged</small></button>
+          <hr>
+          <label class="menu-toggle"><svg class="ic"><use href="#i-arrows"/></svg>Crecer hacia arriba<input type="checkbox" id="toggleGrow"><span class="switch"></span></label>
+          <button role="menuitem" data-action="sample"><svg class="ic"><use href="#i-sprout"/></svg>Ver árbol de ejemplo</button>
+          <button role="menuitem" data-action="install" id="menuInstall" hidden><svg class="ic"><use href="#i-install"/></svg>Instalar aplicación</button>
+          <hr>
+          <button role="menuitem" data-action="reset" class="danger"><svg class="ic"><use href="#i-reset"/></svg>Empezar de cero</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="stage" id="stage">
+    <div class="world" id="world">
+      <svg class="links" id="links"></svg>
+      <div class="nodes" id="nodes"></div>
+    </div>
+
+    <section class="empty" id="empty" hidden>
+      <svg class="sapling" viewBox="0 0 160 140" aria-hidden="true">
+        <ellipse class="sp-ground" cx="80" cy="124" rx="52" ry="7"/>
+        <path class="sp-stem" d="M80 123c0-20 2-38-2-60"/>
+        <path class="sp-stem thin" d="M79 92c-9-4-16-10-20-20M80 78c8-4 15-12 17-22"/>
+        <path class="sp-leaf l1" d="M59 72c-14 2-24-6-26-18 13-2 24 5 26 18Z"/>
+        <path class="sp-leaf l2" d="M97 56c4-13 15-20 28-18-3 13-14 20-28 18Z"/>
+        <path class="sp-leaf l3" d="M78 63c-9-10-9-24 0-34 9 10 9 24 0 34Z"/>
+      </svg>
+      <h2>Todo árbol empieza con una semilla</h2>
+      <p>Añade a la primera persona de tu familia o carga un árbol que ya tengas en formato <b>.json</b> o <b>GEDCOM</b>.</p>
+      <div class="empty-actions">
+        <button class="btn primary lg" data-action="first"><svg class="ic"><use href="#i-sprout"/></svg>Plantar la primera persona</button>
+        <button class="btn ghost lg" data-action="import"><svg class="ic"><use href="#i-upload"/></svg>Cargar archivo</button>
+      </div>
+      <button class="link" data-action="sample">o explora un árbol de ejemplo</button>
+    </section>
+
+    <div class="zoom" id="zoomCtl">
+      <button class="icon-btn" id="zoomIn" aria-label="Acercar"><svg class="ic"><use href="#i-plus"/></svg></button>
+      <button class="icon-btn" id="zoomOut" aria-label="Alejar"><svg class="ic"><use href="#i-minus"/></svg></button>
+      <button class="icon-btn" id="zoomFit" aria-label="Ver todo el árbol"><svg class="ic"><use href="#i-fit"/></svg></button>
+    </div>
+  </main>
+
+  <aside class="panel" id="panel" aria-hidden="true">
+    <div class="grip" aria-hidden="true"></div>
+    <button class="icon-btn panel-close" id="panelClose" aria-label="Cerrar"><svg class="ic"><use href="#i-close"/></svg></button>
+    <div class="panel-body" id="panelBody"></div>
+  </aside>
+
+  <dialog class="confirm" id="confirm">
+    <form method="dialog">
+      <p id="confirmMsg"></p>
+      <div class="confirm-actions">
+        <button class="btn ghost" value="cancel">Cancelar</button>
+        <button class="btn primary" value="ok" id="confirmOk">Aceptar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <input type="file" id="fileInput" accept=".json,.ged,.gedcom,application/json,text/plain" hidden>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
